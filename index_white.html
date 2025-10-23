@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang='es'><head><meta charset='utf-8'><meta name='viewport' content='width=device-width,initial-scale=1'>
+<title>Lucanero · Pedido</title><style>:root{--bg:#f6f6f6;--card:#ffffff;--text:#222;--muted:#666;}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,'Helvetica Neue',Arial,sans-serif}
+header{position:sticky;top:0;background:var(--card);z-index:20;border-bottom:1px solid #e5e7eb}
+.container{max-width:1000px;margin:0 auto;padding:16px}
+.brand{display:flex;align-items:center;gap:12px}
+.brand img{height:48px}
+.grid{display:grid;grid-template-columns:1fr;gap:16px}
+@media (min-width:900px){.grid{grid-template-columns:2fr 1fr}}
+.card{background:var(--card);border:1px solid #e5e7eb;border-radius:16px;padding:16px}
+h1,h2,h3{margin:0 0 8px 0}
+.section-title{display:flex;justify-content:space-between;align-items:center;margin:4px 0 12px 0}
+.items{display:grid;grid-template-columns:1fr;gap:10px}
+.item{display:flex;justify-content:space-between;gap:8px;align-items:flex-start;border:1px solid #e5e7eb;border-radius:12px;padding:10px}
+.item h4{margin:0 0 4px 0;font-size:1rem}
+.price{white-space:nowrap;font-weight:600}
+button{border-radius:12px;border:1px solid #111;background:#111;color:#fff;padding:8px 12px;cursor:pointer}
+button.ghost{background:#fff;color:#111}
+.small{font-size:0.85rem;color:var(--muted)}
+.cart-list{display:flex;flex-direction:column;gap:10px}
+.cart-line{display:flex;justify-content:space-between;gap:8px;align-items:center;border-bottom:1px dashed #e5e7eb;padding-bottom:8px}
+.total{display:flex;justify-content:space-between;font-weight:700;font-size:1.1rem;margin-top:8px}
+.footer-note{text-align:center;color:#888;font-size:0.85rem;margin:18px 0}
+</style></head>
+<body><header><div class='container'><div class='brand'><img src='logo.png' alt='Lucanero'><h1>Lucanero</h1></div></div></header>
+<main class='container'><div class='grid'><section class='card'>
+<h2>Bebidas</h2><div id='cat-bebidas' class='items'></div>
+<h2>Waffles</h2><div id='cat-waffles' class='items'></div>
+<h2>Crepas</h2><div id='cat-crepas' class='items'></div>
+<h2>Pastelitos</h2><div id='cat-pasteles' class='items'></div>
+<h2>Combos Meriendas</h2><div id='cat-combos' class='items'></div>
+</section>
+<aside class='card'><h2>Tu pedido</h2><div id='cart' class='cart-list'></div><div class='total'><span>Total</span><span id='total'>$0.00</span></div>
+<hr><label>Nombre</label><input id='name' placeholder='Tu nombre'>
+<label>Número de casa</label><input id='house' placeholder='Ej. Casa 24'>
+<label>Notas</label><input id='notes' placeholder='Sin azúcar / extra cajeta'>
+<button id='send'>Enviar por WhatsApp</button> <button id='copy' class='ghost'>Copiar pedido</button></aside></div>
+<div class='footer-note'>Hecho con cariño para Lucanero · © 2025</div></main>
+
+<script>
+const MENU = {
+  "bebidas": [
+    {id:"capuchino", name:"Café capuchino", price:35},
+    {id:"americano", name:"Café americano", price:28},
+    {id:"chocolate", name:"Chocolate caliente", price:35}
+  ],
+  "waffles": [
+    {id:"waffle_dulce", name:"Waffle dulce", price:50, opts:true},
+    {id:"waffle_helado", name:"Waffle con helado", price:65, opts:true}
+  ],
+  "crepas": [
+    {id:"crepa_dulce", name:"Crepa dulce", price:55, opts:true},
+    {id:"crepa_salada", name:"Crepa salada", price:55, opts:true}
+  ],
+  "pasteles": [
+    {id:"oreo", name:"Pastelillo Oreo", price:45},
+    {id:"fresas", name:"Pastelillo Fresas con crema", price:45},
+    {id:"redvelvet", name:"Pastelillo Red Velvet", price:45},
+    {id:"tiramisu", name:"Pastelillo Tiramisú de café", price:45},
+    {id:"zanahoria", name:"Pastelillo Zanahoria c/ arándano", price:45}
+  ],
+  "combos":[
+    {id:"combo_crepa_dulce", name:"Café + Crepa dulce", price:75, opts:true},
+    {id:"combo_crepa_salada", name:"Café + Crepa salada", price:80, opts:true},
+    {id:"combo_pastel", name:"Café + Pastelillo", price:65},
+    {id:"combo_waffle", name:"Café + Waffle dulce", price:70, opts:true}
+  ]
+};
+
+const DIPS = ["Lechera","Queso crema","Cajeta","Mermelada","Crema de avellana"];
+const ING = ["Fresa","Zarzamora","Frambuesa","Banana","Arándano","Almendra","Nuez"];
+const cart = [];
+
+function money(n){return new Intl.NumberFormat('es-MX',{style:'currency',currency:'MXN'}).format(n)};
+
+function addToCart(item){cart.push(item);renderCart();scrollTo(0,0);}
+
+function renderCategory(el, items){
+  el.innerHTML = "";
+  items.forEach(it=>{
+    const row=document.createElement('div');row.className="item";
+    const left=document.createElement('div');
+    left.innerHTML=`<h4>${it.name}</h4>`;
+    const right=document.createElement('div');
+    right.innerHTML=`<div class='price'>${money(it.price)}</div>`;
+    const actions=document.createElement('div');
+    if(it.opts){
+      const dip=document.createElement('select');
+      dip.innerHTML=`<option value=''>Dip (opcional)</option>`+DIPS.map(d=>`<option>${d}</option>`).join("");
+      const ing1=document.createElement('select');
+      ing1.innerHTML=`<option value=''>Ingrediente 1</option>`+ING.map(d=>`<option>${d}</option>`).join("");
+      const ing2=document.createElement('select');
+      ing2.innerHTML=`<option value=''>Ingrediente 2</option>`+ING.map(d=>`<option>${d}</option>`).join("");
+      const btn=document.createElement('button');btn.textContent="Agregar";
+      btn.onclick=()=>addToCart({...it,qty:1,note:`Dip: ${dip.value||'—'}; Ing: ${[ing1.value||'—',ing2.value||'—'].join(', ')}`});
+      actions.append(dip,ing1,ing2,btn);
+    }else{
+      const btn=document.createElement('button');btn.textContent="Agregar";
+      btn.onclick=()=>addToCart({...it,qty:1});
+      actions.append(btn);
+    }
+    right.append(actions);row.append(left,right);el.append(row);
+  });
+}
+
+function renderCart(){
+  const el=document.getElementById('cart');el.innerHTML="";let sum=0;
+  cart.forEach((it,idx)=>{const line=document.createElement('div');line.className="cart-line";
+  const title=document.createElement('div');
+  title.innerHTML=`<div><b>${it.name}</b> ${it.note?`<span class='small'>(${it.note})</span>`:""}</div>
+  <div class='small'>${money(it.price)} × <input type='number' min='1' value='${it.qty}' style='width:64px'> = <b>${money(it.qty*it.price)}</b></div>`;
+  const del=document.createElement('button');del.className="ghost";del.textContent="Quitar";del.onclick=()=>{cart.splice(idx,1);renderCart();};
+  const q=title.querySelector('input');q.oninput=()=>{it.qty=Math.max(1,parseInt(q.value||'1'));renderCart();};
+  line.append(title,del);el.append(line);sum+=it.qty*it.price;});
+  document.getElementById('total').textContent=money(sum);
+}
+
+function buildMessage(){
+  const name=document.getElementById('name').value.trim();
+  const house=document.getElementById('house').value.trim();
+  const notes=document.getElementById('notes').value.trim();
+  if(cart.length===0)return alert("Agrega al menos un producto.");
+  if(!name||!house)return alert("Ingresa tu nombre y número de casa.");
+  let lines=[];
+  lines.push("🖤 *Pedido Lucanero*");
+  lines.push(`👤 Nombre: ${name}`);
+  lines.push(`🏠 Casa: ${house}`);
+  if(notes)lines.push(`📝 Notas: ${notes}`);
+  lines.push("\n*Artículos:*");
+  cart.forEach(it=>lines.push(`• ${it.name} x${it.qty} ${it.note?`(${it.note})`:""} — ${money(it.qty*it.price)}`));
+  lines.push(`\n*Total:* ${document.getElementById('total').textContent}`);
+  return lines.join("\n");
+}
+
+document.getElementById('send').onclick=()=>{const msg=buildMessage();if(!msg)return;
+  const url=`https://wa.me/523312167670?text=${encodeURIComponent(msg)}`;window.open(url,"_blank");};
+document.getElementById('copy').onclick=async()=>{const msg=buildMessage();if(!msg)return;await navigator.clipboard.writeText(msg);alert("Pedido copiado.");};
+
+renderCategory(document.getElementById('cat-bebidas'),MENU.bebidas);
+renderCategory(document.getElementById('cat-waffles'),MENU.waffles);
+renderCategory(document.getElementById('cat-crepas'),MENU.crepas);
+renderCategory(document.getElementById('cat-pasteles'),MENU.pasteles);
+renderCategory(document.getElementById('cat-combos'),MENU.combos);
+</script>
+</body></html>
