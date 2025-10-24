@@ -1,231 +1,297 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="es">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lucanero · Pedido</title>
+<style>
+:root{
+  /* Paleta CLARA (beige) */
+  --paper:#f2eadd; --card:#fffefb; --ink:#221e1b; --muted:#7c7267;
+  --sepia: sepia(100%) hue-rotate(-10deg) saturate(70%) brightness(90%);
+}
+*{box-sizing:border-box} html,body{margin:0}
+body{
+  background: var(--paper);
+  font-family: system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,"Helvetica Neue",Arial,sans-serif;
+  color: var(--ink);
+}
 
-  <!-- SEO / Open Graph -->
-  <meta property="og:title" content="Lucanero · Pedido" />
-  <meta property="og:description" content="Waffles, crepas, café y pastelitos a tu puerta." />
-  <meta property="og:type" content="website" />
-  <meta property="og:url" content="https://lucanero.aquiloencuentras.com.mx/" />
-  <meta property="og:image" content="https://lucanero.aquiloencuentras.com.mx/og-image.png" />
-  <meta property="og:image:width" content="1200" />
-  <meta property="og:image:height" content="630" />
+/* ===== FONDO CON GRANOS (usa granos.png + respaldo sin imagen) ===== */
+body::before{
+  content:"";
+  position:fixed;
+  inset:0;
+  z-index:0;
+  pointer-events:none;
+  /* Varias copias del mismo PNG en posiciones distintas + una textura de respaldo */
+  background:
+    url('granos.png') no-repeat 2% 12% / 90px,
+    url('granos.png') no-repeat 95% 18% / 90px,
+    url('granos.png') no-repeat 6% 82%  / 100px,
+    url('granos.png') no-repeat 88% 85% / 110px,
+    url('granos.png') no-repeat 50% 10% / 90px,
+    url('granos.png') no-repeat 50% 92% / 100px,
+    radial-gradient(rgba(0,0,0,0.06) 1px, transparent 1px);
+  opacity:.14; /* ajusta 0.10 más tenue, 0.18 más visible */
+  filter: grayscale(100%) contrast(110%);
+}
+/* Asegura que TODO tu contenido quede por encima del wallpaper */
+main, header, .card, aside { position: relative; z-index: 1; }
 
-  <!-- Twitter Card -->
-  <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="Lucanero · Pedido" />
-  <meta name="twitter:description" content="Waffles, crepas, café y pastelitos a tu puerta." />
-  <meta name="twitter:image" content="https://lucanero.aquiloencuentras.com.mx/og-image.png" />
+header{position:sticky;top:0;z-index:50;border-bottom:1px solid #e3d9c7;
+  background:linear-gradient(to bottom,rgba(242,234,221,.96),rgba(242,234,221,.88))}
+.container{max-width:1100px;margin:0 auto;padding:16px}
+.brand{display:flex;gap:16px;align-items:center}
+.brand img{height:88px;filter:grayscale(100%)}
+.brand h1{margin:0}
+.brand .slogan{color:var(--muted);margin-top:2px}
 
-  <!-- Favicon / Iconos -->
-  <link rel="icon" href="/favicon.png" sizes="512x512" type="image/png" />
-  <link rel="apple-touch-icon" href="/favicon.png" />
-
-  <title>Lucanero · Pedido</title>
-  <style>
-:root{--bg:#f6f1e9;--card:#ffffff;--text:#2b241e;--muted:#7d6f61;--ink:#000}
-*{box-sizing:border-box}
-html,body{margin:0;padding:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,'Helvetica Neue',Arial,sans-serif}
-header{position:sticky;top:0;background:var(--card);z-index:20;border-bottom:1px solid #e5e7eb}
-.container{max-width:1000px;margin:0 auto;padding:16px}
-.brand{display:flex;align-items:center;gap:12px}
-.brand img{height:84px;filter:grayscale(100%)}
+/* Layout */
 .grid{display:grid;grid-template-columns:1fr;gap:16px}
-@media (min-width:900px){.grid{grid-template-columns:2fr 1fr}}
-.card{background:var(--card);border:1px solid #e5e7eb;border-radius:16px;padding:16px;position:relative;overflow:hidden}
-h1,h2,h3{margin:0 0 8px 0}
-.section-title{display:flex;justify-content:space-between;align-items:center;margin:4px 0 12px 0}
-.section-title img.icon{height:42px;opacity:.8;filter:grayscale(100%)}
+@media(min-width:900px){.grid{grid-template-columns:2fr 1fr}}
+.card{position:relative;background:var(--card);border:1px solid #e6dfd2;border-radius:16px;padding:18px;overflow:hidden;box-shadow:0 2px 6px rgba(0,0,0,.03)}
+h2{margin:0 0 10px}
+
+/* Capa decorativa dentro de la tarjeta (visible si pones los PNGs) */
+.decors{position:absolute;inset:0;z-index:0;pointer-events:none}
+.decors img{position:absolute;opacity:.22;filter:grayscale(100%) contrast(110%)}
+.decors .cafetera{top:8px;left:12px;width:115px;transform:rotate(-2deg)}
+.decors .leche{top:78px;left:150px;width:220px;transform:rotate(-1deg)}
+.decors .vaso{top:0;right:80px;width:120px}
+.decors .waffle{bottom:-8px;left:70px;width:180px}
+.decors .crepa{top:390px;left:-8px;width:145px;transform:rotate(-5deg)}
+.decors .pastel{top:460px;right:18px;width:135px;transform:rotate(2deg)}
+/* Granos dispersos dentro de la tarjeta (si quieres además del wallpaper) */
+.decors .bean1{top:80px;right:-8px;width:90px;transform:rotate(-14deg)}
+.decors .bean2{top:50%;right:10px;width:90px;transform:rotate(10deg)}
+.decors .bean3{bottom:6%;left:12px;width:90px;transform:rotate(-6deg)}
+@media(max-width:900px){.decors{display:none}}
+
+/* Contenido por encima de decoraciones */
+.content{position:relative;z-index:1}
 .items{display:grid;grid-template-columns:1fr;gap:10px}
-.item{display:flex;justify-content:space-between;gap:8px;align-items:flex-start;border:1px solid #e5e7eb;border-radius:12px;padding:10px;background:#fff}
-.item h4{margin:0 0 4px 0;font-size:1rem}
+.item{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;background:#fffdf9;
+  border:1px solid #eadfce;border-radius:12px;padding:12px}
+.item h4{margin:0 0 3px 0;font-size:1rem}
+.desc{color:var(--muted);font-size:.9rem}
 .price{white-space:nowrap;font-weight:700}
-select,input[type='text'],input[type='number']{padding:8px;border:1px solid #e5e7eb;border-radius:10px;font:inherit}
-button{border-radius:12px;border:1px solid #111;background:#111;color:#fff;padding:8px 12px;cursor:pointer}
-button.ghost{background:#fff;color:#111}
-.small{font-size:0.85rem;color:var(--muted)}
+select,input[type="text"],input[type="number"]{padding:8px;border:1px solid #e0d5c6;border-radius:10px;background:#fff;font:inherit}
+button{border-radius:12px;border:1px solid #222;background:#222;color:#fff;padding:8px 12px;cursor:pointer}
+button.ghost{background:#fff;color:#222}
+.small{font-size:.85rem;color:var(--muted)}
 .cart-list{display:flex;flex-direction:column;gap:10px}
-.cart-line{display:flex;justify-content:space-between;gap:8px;align-items:center;border-bottom:1px dashed #e5e7eb;padding-bottom:8px}
+.cart-line{display:flex;justify-content:space-between;gap:8px;align-items:center;border-bottom:1px dashed #e0d5c6;padding-bottom:8px}
 .total{display:flex;justify-content:space-between;font-weight:700;font-size:1.1rem;margin-top:8px}
-.footer-note{text-align:center;color:#888;font-size:0.85rem;margin:18px 0}
-/* coffee beans sprinkled */
-.bean{position:absolute;opacity:.1;filter:grayscale(100%)}
-.bean.b1{top:8%;right:8%} .bean.b2{top:40%;left:-10px;transform:rotate(-15deg)}
-.bean.b3{bottom:6%;right:-8px;transform:rotate(18deg)}
-@media (max-width:860px){ .bean{display:none} }
-  </style>
+.footer{text-align:center;color:#8a8278;font-size:.85rem;margin:18px 0}
+
+/* Marca de agua del logo (sepia translúcido) */
+.watermark{position:fixed;right:16px;bottom:16px;opacity:.25;z-index:0;pointer-events:none}
+.watermark img{width:200px;max-width:35vw;filter:var(--sepia)}
+
+/* Sin animaciones en versión estática */
+</style>
 </head>
 <body>
-<header><div class='container'>
-  <div class='brand'><img src='logo.png' alt='Lucanero'><h1>Lucanero</h1></div>
-</div></header>
+<header>
+  <div class="container">
+    <div class="brand">
+      <img src="logo.png" alt="Lucanero">
+      <div><h1>Lucanero</h1><div class="slogan">Una pausa dulce, un momento Lucanero.</div></div>
+    </div>
+  </div>
+</header>
 
-<main class='container'>
-  <img class="bean b1" src="granos.png" alt="granos">
-  <img class="bean b2" src="granos.png" alt="granos">
-  <img class="bean b3" src="granos.png" alt="granos">
-  <div class='grid'>
-    <section class='card'>
-      <div class="section-title"><h2>Bebidas</h2><img class="icon" src="vaso_cafe.png" alt="Café"></div>
-      <div id='cat-bebidas' class='items'></div>
+<main class="container">
+  <div class="grid">
+    <section class="card">
+      <div class="decors">
+        <img src="cafetera.png" class="cafetera" alt="">
+        <img src="leche.png" class="leche" alt="">
+        <img src="vaso_cafe.png" class="vaso" alt="">
+        <img src="waffle.png" class="waffle" alt="">
+        <img src="crepa.png" class="crepa" alt="">
+        <img src="pastel_taza.png" class="pastel" alt="">
+        <img src="granos.png" class="bean1" alt="">
+        <img src="granos.png" class="bean2" alt="">
+        <img src="granos.png" class="bean3" alt="">
+      </div>
 
-      <div class="section-title"><h2>Waffles</h2><img class="icon" src="waffle.png" alt="Waffle"></div>
-      <div id='cat-waffles' class='items'></div>
+      <div class="content">
+        <h2>Bebidas</h2>
+        <div id="cat-bebidas" class="items"></div>
 
-      <div class="section-title"><h2>Crepas</h2><img class="icon" src="crepa.png" alt="Crepa"></div>
-      <div id='cat-crepas' class='items'></div>
+        <h2>Waffles</h2>
+        <div id="cat-waffles" class="items"></div>
 
-      <div class="section-title"><h2>Pastelitos</h2><img class="icon" src="pastel_taza.png" alt="Pastel y taza"></div>
-      <div id='cat-pasteles' class='items'></div>
+        <h2>Crepas</h2>
+        <div id="cat-crepas" class="items"></div>
 
-      <div class="section-title"><h2>Combos Meriendas</h2><img class="icon" src="cafetera.png" alt="Cafetera"></div>
-      <div id='cat-combos' class='items'></div>
+        <h2>Pastelitos</h2>
+        <div id="cat-pasteles" class="items"></div>
+
+        <h2>Combos Meriendas</h2>
+        <div id="cat-combos" class="items"></div>
+      </div>
     </section>
-    <aside class='card'><h2>Tu pedido</h2>
-      <div id='cart' class='cart-list'></div>
-      <div class='total'><span>Total</span><span id='total'>$0.00</span></div>
-      <hr>
+
+    <aside class="card content">
+      <h2>Tu pedido</h2>
+      <div class="cart-list" id="cart"></div>
+      <div class="total"><span>Total</span><span id="total">$0.00</span></div>
+      <hr style="margin:12px 0">
       <h3 style="margin:0 0 6px 0">Datos de entrega</h3>
-      <label class='small'>Nombre</label><input id='name' placeholder='Tu nombre' style="width:100%">
-      <label class='small'>Número de casa</label><input id='house' placeholder='Ej. Casa 24' style="width:100%">
-      <label class='small'>Notas (opcional)</label><input id='notes' placeholder='Sin azúcar / extra cajeta' style="width:100%">
-      <div class='small' style="margin-top:6px">El pedido se enviará por WhatsApp.</div>
-      <div style="display:flex;gap:8px;margin-top:8px"><button id='send'>Enviar por WhatsApp</button> <button id='copy' class='ghost'>Copiar pedido</button></div>
+      <label class="small">Nombre</label><input id="name" placeholder="Tu nombre" style="width:100%;margin:4px 0 8px">
+      <label class="small">Número de casa</label><input id="house" placeholder="Ej. Casa 24" style="width:100%;margin:4px 0 8px">
+      <label class="small">Notas (opcional)</label><input id="notes" placeholder="Sin azúcar / extra cajeta" style="width:100%;margin:4px 0 12px">
+
+      <div class="small">Forma de pago</div>
+      <div style="display:flex;gap:8px;align-items:center;margin:4px 0 4px">
+        <select id="payMethod">
+          <option>Efectivo</option><option>Transferencia</option><option>Tarjeta</option>
+        </select>
+        <input id="cashGiven" type="number" min="0" step="1" placeholder="Con cuánto paga" style="width:150px">
+      </div>
+      <div class="small" id="changeLabel" style="margin:0 0 8px;color:#5c5248"></div>
+
+      <div class="small" style="margin-bottom:8px;color:#8a8278">El pedido se enviará por WhatsApp.</div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap">
+        <button id="send">Enviar por WhatsApp</button>
+        <button class="ghost" id="copy">Copiar pedido</button>
+      </div>
     </aside>
   </div>
-  <div class='footer-note'>Hecho con cariño para Lucanero · © 2025</div>
+
+  <div class="footer">Hecho con cariño para Lucanero · © 2025</div>
 </main>
 
+<!-- Marca de agua -->
+<div class="watermark"><img src="logo.png" alt=""></div>
+
 <script>
-// === DATA ===
 const MENU = {
-  "bebidas": [
+  bebidas:[
     {id:"capuchino", name:"Café capuchino", price:35, milk:true},
     {id:"americano", name:"Café americano", price:28, milk:true},
     {id:"chocolate", name:"Chocolate caliente", price:35, milk:true}
   ],
-  "waffles": [
+  waffles:[
     {id:"waffle_dulce", name:"Waffle dulce", price:50, sweet:true},
     {id:"waffle_helado", name:"Waffle con helado", price:65, sweet:true}
   ],
-  "crepas": [
+  crepas:[
     {id:"crepa_dulce", name:"Crepa dulce", price:55, sweet:true},
     {id:"crepa_salada", name:"Crepa salada", price:55, savory:true}
   ],
-  "pasteles": [
+  pasteles:[
     {id:"oreo", name:"Pastelillo Oreo", price:45},
     {id:"fresas", name:"Pastelillo Fresas con crema", price:45},
     {id:"redvelvet", name:"Pastelillo Red Velvet", price:45},
     {id:"tiramisu", name:"Pastelillo Tiramisú de café", price:45},
     {id:"zanahoria", name:"Pastelillo Zanahoria c/ arándano", price:45}
   ],
-  "combos":[
+  combos:[
     {id:"combo_crepa_dulce", name:"Café + Crepa dulce", price:75, sweet:true},
     {id:"combo_crepa_salada", name:"Café + Crepa salada", price:80, savory:true},
     {id:"combo_pastel", name:"Café + Pastelillo", price:65},
     {id:"combo_waffle", name:"Café + Waffle dulce", price:70, sweet:true}
   ]
 };
-
 const DIPS = ["Lechera","Queso crema","Cajeta","Mermelada","Crema de avellana"];
 const ING_SWEET = ["Fresa","Zarzamora","Frambuesa","Banana","Arándano","Almendra","Nuez"];
 const MILK = ["Entera","Light","Sin lactosa","Almendras"];
 const ING_SALTY = ["Manchego","Jamón","Queso crema","Champiñones","Espinacas","Rajitas"];
 
-const cart = [];
+const cart=[];
+const money=n=>new Intl.NumberFormat('es-MX',{style:'currency',currency:'MXN'}).format(n);
+const addToCart=it=>{cart.push(it);renderCart();updateChange();window.scrollTo({top:0,behavior:'smooth'});};
 
-// === HELPERS ===
-function money(n){return new Intl.NumberFormat('es-MX',{style:'currency',currency:'MXN'}).format(n)};
-function addToCart(item){cart.push(item);renderCart();scrollTo(0,0);};
-
-// === RENDER ===
-function renderCategory(el, items){
+function renderCategory(el,items){
   el.innerHTML="";
   items.forEach(it=>{
     const row=document.createElement('div');row.className="item";
     const left=document.createElement('div');
-    let hint = it.sweet ? "Elige 1 dip y 2 ingredientes" : it.savory ? "Elige 2 ingredientes salados" : it.milk ? "Elige tu tipo de leche" : "";
-    left.innerHTML=`<h4>${it.name}</h4>${hint?`<div class='small'>${hint}</div>`:""}`;
-    const right=document.createElement('div');
-    right.innerHTML=`<div class='price'>${money(it.price)}</div>`;
+    const hint = it.sweet?"Elige 1 dip y 2 ingredientes":it.savory?"Elige 2 ingredientes salados":it.milk?"Elige tu tipo de leche":"";
+    left.innerHTML=`<h4>${it.name}</h4>${hint?`<div class='desc'>${hint}</div>`:""}`;
+    const right=document.createElement('div');right.innerHTML=`<div class='price'>${money(it.price)}</div>`;
     const actions=document.createElement('div');actions.style.display="flex";actions.style.flexWrap="wrap";actions.style.gap="6px";
 
-    if (it.milk) {
-      const milk = document.createElement('select');
-      milk.innerHTML = `<option value=''>Leche</option>` + MILK.map(d=>`<option>${d}</option>`).join("");
-      const btn = document.createElement('button'); btn.textContent="Agregar";
-      btn.onclick = ()=> addToCart({...it, qty:1, note:`Leche: ${milk.value||'—'}`});
-      actions.append(milk, btn);
-    } else if (it.savory) {
-      const s1 = document.createElement('select');
-      s1.innerHTML = `<option value=''>Ingrediente 1</option>` + ING_SALTY.map(d=>`<option>${d}</option>`).join("");
-      const s2 = document.createElement('select');
-      s2.innerHTML = `<option value=''>Ingrediente 2</option>` + ING_SALTY.map(d=>`<option>${d}</option>`).join("");
-      const btn = document.createElement('button'); btn.textContent="Agregar";
-      btn.onclick = ()=> addToCart({...it, qty:1, note:`Ing salados: ${[s1.value||'—', s2.value||'—'].join(', ')}`});
-      actions.append(s1, s2, btn);
-    } else if (it.sweet) {
-      const dip=document.createElement('select');
-      dip.innerHTML = `<option value=''>Dip (opcional)</option>` + DIPS.map(d=>`<option>${d}</option>`).join("");
-      const ing1=document.createElement('select');
-      ing1.innerHTML = `<option value=''>Ingrediente 1</option>` + ING_SWEET.map(d=>`<option>${d}</option>`).join("");
-      const ing2=document.createElement('select');
-      ing2.innerHTML = `<option value=''>Ingrediente 2</option>` + ING_SWEET.map(d=>`<option>${d}</option>`).join("");
-      const btn=document.createElement('button'); btn.textContent="Agregar";
-      btn.onclick=()=> addToCart({...it, qty:1, note:`Dip: ${dip.value||'—'}; Ing: ${[ing1.value||'—',ing2.value||'—'].join(', ')}`});
-      actions.append(dip,ing1,ing2,btn);
-    } else {
+    if(it.milk){
+      const milk=document.createElement('select');milk.innerHTML=`<option value=''>Leche</option>`+MILK.map(d=>`<option>${d}</option>`).join("");
       const btn=document.createElement('button');btn.textContent="Agregar";
-      btn.onclick=()=>addToCart({...it,qty:1});
-      actions.append(btn);
+      btn.onclick=()=>addToCart({...it,qty:1,note:`Leche: ${milk.value||'—'}`}); actions.append(milk,btn);
+    }else if(it.savory){
+      const s1=document.createElement('select');s1.innerHTML=`<option value=''>Ingrediente 1</option>`+ING_SALTY.map(d=>`<option>${d}</option>`).join("");
+      const s2=document.createElement('select');s2.innerHTML=`<option value=''>Ingrediente 2</option>`+ING_SALTY.map(d=>`<option>${d}</option>`).join("");
+      const btn=document.createElement('button');btn.textContent="Agregar";
+      btn.onclick=()=>addToCart({...it,qty:1,note:`Ing salados: ${[s1.value||'—',s2.value||'—'].join(', ')}`}); actions.append(s1,s2,btn);
+    }else if(it.sweet){
+      const dip=document.createElement('select');dip.innerHTML=`<option value=''>Dip (opcional)</option>`+DIPS.map(d=>`<option>${d}</option>`).join("");
+      const ing1=document.createElement('select');ing1.innerHTML=`<option value=''>Ingrediente 1</option>`+ING_SWEET.map(d=>`<option>${d}</option>`).join("");
+      const ing2=document.createElement('select');ing2.innerHTML=`<option value=''>Ingrediente 2</option>`+ING_SWEET.map(d=>`<option>${d}</option>`).join("");
+      const btn=document.createElement('button');btn.textContent="Agregar";
+      btn.onclick=()=>addToCart({...it,qty:1,note:`Dip: ${dip.value||'—'}; Ing: ${[ing1.value||'—',ing2.value||'—'].join(', ')}`}); actions.append(dip,ing1,ing2,btn);
+    }else{
+      const btn=document.createElement('button');btn.textContent="Agregar";btn.onclick=()=>addToCart({...it,qty:1});actions.append(btn);
     }
-    right.append(actions);row.append(left,right);el.append(row);
+    right.append(actions); row.append(left,right); el.append(row);
   });
 }
 
 function renderCart(){
-  const el=document.getElementById('cart');el.innerHTML="";let sum=0;
+  const el=document.getElementById('cart');el.innerHTML=""; let sum=0;
   cart.forEach((it,idx)=>{
     const line=document.createElement('div');line.className="cart-line";
     const title=document.createElement('div');
     title.innerHTML=`<div><b>${it.name}</b> ${it.note?`<span class='small'>(${it.note})</span>`:""}</div>
       <div class='small'>${money(it.price)} × 
-      <input type='number' min='1' value='${it.qty}' style='width:64px;padding:6px;border:1px solid #e5e7eb;border-radius:8px'> = <b>${money(it.qty*it.price)}</b></div>`;
-    const del=document.createElement('button');del.className="ghost";del.textContent="Quitar";del.onclick=()=>{cart.splice(idx,1);renderCart();};
-    const q=title.querySelector('input');q.oninput=()=>{it.qty=Math.max(1,parseInt(q.value||'1'));renderCart();};
-    line.append(title,del);el.append(line);sum+=it.qty*it.price;
+      <input type='number' min='1' value='${it.qty}' style='width:64px;padding:6px;border:1px solid #e0d5c6;border-radius:8px'> = <b>${money(it.qty*it.price)}</b></div>`;
+    const del=document.createElement('button');del.className="ghost";del.textContent="Quitar";
+    del.onclick=()=>{cart.splice(idx,1);renderCart();updateChange();};
+    const input=title.querySelector('input');input.oninput=()=>{it.qty=Math.max(1,parseInt(input.value||'1'));renderCart();updateChange();};
+    line.append(title,del);el.append(line); sum+=it.qty*it.price;
   });
   document.getElementById('total').textContent=money(sum);
 }
+function totalNumber(){return cart.reduce((a,b)=>a+b.qty*b.price,0);}
+function updateChange(){
+  const method=document.getElementById('payMethod').value;
+  const given=parseFloat(document.getElementById('cashGiven').value||'0');
+  const total=totalNumber(); const label=document.getElementById('changeLabel');
+  if(method!=="Efectivo"){label.textContent="";return;}
+  if(given<=0){label.textContent="";return;}
+  const diff=given-total; label.textContent = diff>=0?("Cambio: "+money(diff)):("Falta: "+money(-diff));
+}
+document.getElementById('payMethod').onchange=updateChange;
+document.getElementById('cashGiven').oninput=updateChange;
 
 function buildMessage(){
   const name=document.getElementById('name').value.trim();
   const house=document.getElementById('house').value.trim();
   const notes=document.getElementById('notes').value.trim();
-  if(cart.length===0)return alert("Agrega al menos un producto.");
-  if(!name||!house)return alert("Ingresa tu nombre y número de casa.");
+  const method=document.getElementById('payMethod').value;
+  const given=parseFloat(document.getElementById('cashGiven').value||'0');
+  if(cart.length===0) return alert("Agrega al menos un producto.");
+  if(!name||!house) return alert("Ingresa tu nombre y número de casa.");
+  const total=totalNumber();
   let lines=[];
   lines.push("🖤 *Pedido Lucanero*");
-  lines.push(`👤 Nombre: ${name}`);
-  lines.push(`🏠 Casa: ${house}`);
-  if(notes)lines.push(`📝 Notas: ${notes}`);
-  lines.push("\n*Artículos:*");
-  cart.forEach(it=>lines.push(`• ${it.name} x${it.qty} ${it.note?`(${it.note})`:""} — ${money(it.qty*it.price)}`));
-  lines.push(`\n*Total:* ${document.getElementById('total').textContent}`);
+  lines.push(`👤 Nombre: ${name}`); lines.push(`🏠 Casa: ${house}`);
+  if(notes) lines.push(`📝 Notas: ${notes}`);
+  lines.push("\n*Artículos:*"); cart.forEach(it=>lines.push(`• ${it.name} x${it.qty} ${it.note?`(${it.note})`:""} — ${money(it.qty*it.price)}`));
+  lines.push(`\n*Total:* ${money(total)}`); lines.push(`*Forma de pago:* ${method}`);
+  if(method==="Efectivo" && given>0){
+    const diff=given-total; lines.push(`Paga con: ${money(given)}`); lines.push(diff>=0?`Cambio: ${money(diff)}`:`Falta: ${money(-diff)}`);
+  }
   return lines.join("\n");
 }
+document.getElementById('send').onclick=()=>{const msg=buildMessage(); if(!msg)return; window.open("https://wa.me/523312167670?text="+encodeURIComponent(msg),"_blank");};
+document.getElementById('copy').onclick=async()=>{const msg=buildMessage(); if(!msg)return; await navigator.clipboard.writeText(msg); alert("Pedido copiado. Pégalo en WhatsApp.");};
 
-document.getElementById('send').onclick=()=>{const msg=buildMessage();if(!msg)return;
-  const url=`https://wa.me/523312167670?text=${encodeURIComponent(msg)}`;window.open(url,"_blank");};
-document.getElementById('copy').onclick=async()=>{const msg=buildMessage();if(!msg)return;await navigator.clipboard.writeText(msg);alert("Pedido copiado.");};
-
-renderCategory(document.getElementById('cat-bebidas'),MENU.bebidas);
-renderCategory(document.getElementById('cat-waffles'),MENU.waffles);
-renderCategory(document.getElementById('cat-crepas'),MENU.crepas);
-renderCategory(document.getElementById('cat-pasteles'),MENU.pasteles);
-renderCategory(document.getElementById('cat-combos'),MENU.combos);
+renderCategory(document.getElementById('cat-bebidas'), MENU.bebidas);
+renderCategory(document.getElementById('cat-waffles'), MENU.waffles);
+renderCategory(document.getElementById('cat-crepas'), MENU.crepas);
+renderCategory(document.getElementById('cat-pasteles'), MENU.pasteles);
+renderCategory(document.getElementById('cat-combos'), MENU.combos);
 </script>
 </body>
 </html>
